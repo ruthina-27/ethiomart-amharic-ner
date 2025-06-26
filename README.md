@@ -9,6 +9,7 @@ This project extracts and analyzes e-commerce data from Ethiopian Telegram chann
 - Labels data in CoNLL format for NER
 - Fine-tunes transformer models (XLM-Roberta, mBERT) for Amharic NER
 - Compares models and interprets predictions with SHAP/LIME
+- Generates a vendor scorecard for micro-lending analysis
 
 ## Project Structure
 - `scripts/`: Data scraping, preprocessing, and conversion scripts
@@ -23,34 +24,38 @@ This project extracts and analyzes e-commerce data from Ethiopian Telegram chann
    ```bash
    pip install -r requirements.txt
    ```
-3. Set up your `.env` file with Telegram API credentials:
+3. (Optional) Set up your `.env` file with Telegram API credentials for scraping:
    ```env
    TG_API_ID=your_api_id
    TG_API_HASH=your_api_hash
    PHONE_NUMBER=your_phone_number
    ```
-4. Run the scraper:
-   ```bash
-   python scripts/telegram_scraper.py
-   ```
-5. Preprocess data:
-   ```bash
-   python scripts/preprocess.py
-   ```
-6. Convert labeled data to CoNLL:
-   ```bash
-   python scripts/convert_to_conll.py
-   ```
-7. Open and run the notebook for model training:
-   ```
-   notebooks/fine_tune_ner.ipynb
-   ```
 
-## Usage
-- Update `channels_to_crawl.xlsx` with your target Telegram channels.
-- Use the provided scripts to collect and preprocess data.
-- Label a subset of messages in the required format.
-- Fine-tune and evaluate NER models using the notebook.
+## Running the End-to-End Pipeline
+All steps can be run from the notebook:
+```
+notebooks/end_to_end_pipeline.ipynb
+```
+This notebook covers:
+- Data preprocessing
+- NER dataset preparation
+- Model fine-tuning (XLM-R, mBERT)
+- Model evaluation and comparison
+- Model interpretability (SHAP, LIME)
+- Vendor scorecard generation and analysis
+
+### To run the full pipeline:
+1. Open `notebooks/end_to_end_pipeline.ipynb` in Jupyter or Colab.
+2. Run each cell in order. All scripts and outputs are integrated.
+3. For new data, rerun the preprocessing and vendor scorecard cells.
+
+## Troubleshooting
+- If you encounter missing dependencies, ensure you have run:
+  ```bash
+  pip install -r requirements.txt
+  ```
+- For best performance, use a machine with a GPU and the latest version of PyTorch.
+- If you have issues with file paths, ensure you are running the notebook from the project root or adjust paths as needed.
 
 ## Contribution
 Pull requests and issues are welcome! Please ensure your code is well-documented and tested.

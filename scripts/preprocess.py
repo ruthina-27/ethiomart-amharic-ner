@@ -2,18 +2,36 @@ import pandas as pd
 import re
 from pathlib import Path
 
-df = pd.read_csv("data/raw_data/messages.csv")
+# Use telegram_data.csv as input
+input_file = "telegram_data.csv"
+output_file = "data/cleaned_data.csv"
 
-def clean_amharic_text(text):
+# Read the CSV, skip rows with missing Message
+try:
+    df = pd.read_csv(input_file)
+except Exception as e:
+    print(f"Error reading {input_file}: {e}")
+    exit(1)
+
+# Improved Amharic tokenization: split on whitespace and Amharic punctuation
+def amharic_tokenize(text):
     if pd.isna(text):
         return ""
-    text = re.sub(r"[^\u1200-\u137F0-9፡።፣፤፥፦፧]+", " ", text)  # keep Amharic + numbers
-    text = re.sub(r"\s+", " ", text).strip()
-    return text
+    # Keep Amharic, numbers, and common Amharic punctuation
+    text = re.sub(r"[^\u1200-\u137F0-9፡።፣፤፥፦፧]+", " ", str(text))
+    # Split on whitespace and Amharic punctuation
+    tokens = re.split(r"[\s፡።፣፤፥፦፧]+", text)
+    tokens = [t for t in tokens if t]
+    return " ".join(tokens)
 
-df["clean_text"] = df["text"].apply(clean_amharic_text)
-df = df[["channel", "clean_text", "views", "date", "sender_id"]]
+# Apply cleaning and tokenization
+df["clean_text"] = df["Message"].apply(amharic_tokenize)
+
+# Select relevant columns if they exist
+cols = [c for c in ["Channel Title", "Channel Username", "clean_text", "Date", "Message ID", "Media Path"] if c in df.columns]
+df = df[cols]
 df = df.dropna(subset=["clean_text"])
 
 Path("data").mkdir(parents=True, exist_ok=True)
-df.to_csv("data/cleaned_data.csv", index=False)
+df.to_csv(output_file, index=False)
+print(f"Preprocessed data saved to {output_file}")
